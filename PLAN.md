@@ -72,6 +72,7 @@ export default defineConfig({
 ```
 
 **Env variables:**
+
 - `CLOUDINARY_CLOUD_NAME` — required
 - `CLOUDINARY_API_KEY` — required
 - `CLOUDINARY_API_SECRET` — required for signed uploads/URLs
@@ -84,9 +85,7 @@ export default defineConfig({
 import { v2 as cloudinary, ConfigOptions, UploadApiResponse } from 'cloudinary'
 
 export class CloudinaryService {
-  constructor(
-    protected config: ConfigOptions
-  ) {
+  constructor(protected config: ConfigOptions) {
     cloudinary.config(config)
   }
 
@@ -164,9 +163,10 @@ export class CloudinaryService {
     const config: Record<string, unknown> = { sign_url: true, ...options }
 
     if (options?.expiresAt) {
-      const seconds = typeof options.expiresAt === 'number'
-        ? options.expiresAt
-        : Math.floor((options.expiresAt.getTime() - Date.now()) / 1000)
+      const seconds =
+        typeof options.expiresAt === 'number'
+          ? options.expiresAt
+          : Math.floor((options.expiresAt.getTime() - Date.now()) / 1000)
       config.url_suffix = seconds
     }
 
@@ -174,12 +174,10 @@ export class CloudinaryService {
   }
 
   /** Stream-based upload for multipart files */
-  uploadStream(
-    options?: {
-      resourceType?: 'image' | 'video' | 'raw' | 'auto'
-      [key: string]: unknown
-    }
-  ) {
+  uploadStream(options?: {
+    resourceType?: 'image' | 'video' | 'raw' | 'auto'
+    [key: string]: unknown
+  }) {
     return cloudinary.uploader.upload_stream({
       resource_type: options?.resourceType ?? 'auto',
       ...options,
@@ -221,17 +219,18 @@ export default class CloudinaryProvider {
   async boot() {
     const cloudinary = await this.app.container.make(CloudinaryService)
 
-    edge.global('cloudinaryUrl', (
-      publicId: string,
-      transformations?: Record<string, string | number | boolean>
-    ) => {
-      return cloudinary.transformUrl(publicId, transformations)
-    })
+    edge.global(
+      'cloudinaryUrl',
+      (publicId: string, transformations?: Record<string, string | number | boolean>) => {
+        return cloudinary.transformUrl(publicId, transformations)
+      }
+    )
   }
 }
 ```
 
 **Usage in controllers:**
+
 ```ts
 import { inject } from '@adonisjs/core'
 import { CloudinaryService } from 'adonisjs-cloudinary'
@@ -248,6 +247,7 @@ export default class UploadsController {
 ```
 
 **Usage in Edge:**
+
 ```edge
 <img src="{{ cloudinaryUrl('products/shoe.jpg', { width: 300, crop: 'fill' }) }}" />
 ```
@@ -278,6 +278,7 @@ export interface CloudinaryConfig {
 ## 8. Optional Drive Bridge (`src/drive/cloudinary_drive.ts`)
 
 Cloudinary is not a traditional file system — it has no directories, no byte-level reads, and transformations are first-class. The Drive bridge is **opt-in** and limited to:
+
 - `put` → upload (returns public_id as key)
 - `delete` → destroy
 - `getUrl` → transformUrl (no read)
@@ -421,11 +422,7 @@ export async function configure(command: Configure) {
   const codemods = await command.createCodemods()
 
   // Publish config stub
-  await codemods.makeUsingStub(
-    command.stubsRoot,
-    'config/cloudinary.stub',
-    { }
-  )
+  await codemods.makeUsingStub(command.stubsRoot, 'config/cloudinary.stub', {})
 
   // Register provider in adonisrc.ts
   await codemods.updateRcFile((rcFile) => {
@@ -437,6 +434,7 @@ export async function configure(command: Configure) {
 ## 10. Tests
 
 ### Unit tests for helpers
+
 ```ts
 import { test } from '@japa/runner'
 import { CloudinaryService } from '../src/cloudinary_service.js'
@@ -463,6 +461,7 @@ test.group('CloudinaryService', () => {
 ```
 
 ### Edge helper test
+
 ```ts
 import { test } from '@japa/runner'
 import edge from 'edge.js'
@@ -488,10 +487,10 @@ test.group('Edge helper', () => {
 
 ## 12. Key Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| `cloudinary.sdk` exposes native v2 SDK | Users need full Cloudinary power; wrapping limits them |
-| `uploadImage/Video/File` are thin wrappers | Sets sensible `resource_type` defaults; passes through all other options |
-| Drive bridge is separate/optional | Cloudinary is a media API, not a disk. Forcing full DriveContract compliance would create a leaky abstraction |
+| Decision                                         | Rationale                                                                                                               |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `cloudinary.sdk` exposes native v2 SDK           | Users need full Cloudinary power; wrapping limits them                                                                  |
+| `uploadImage/Video/File` are thin wrappers       | Sets sensible `resource_type` defaults; passes through all other options                                                |
+| Drive bridge is separate/optional                | Cloudinary is a media API, not a disk. Forcing full DriveContract compliance would create a leaky abstraction           |
 | `transformUrl` accepts `Record<string, unknown>` | Cloudinary transformation options are extensive and change frequently; strict typing would require constant maintenance |
-| Edge helper registered in `boot()` | Follows AdonisJS convention; depends on container being fully populated |
+| Edge helper registered in `boot()`               | Follows AdonisJS convention; depends on container being fully populated                                                 |

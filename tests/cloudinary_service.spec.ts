@@ -39,8 +39,14 @@ test.group('CloudinaryService', (group) => {
 
   test('uploadImage passes resource_type: image', async ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const uploadStub = sandbox.stub(cloudinary.uploader, 'upload').resolves({ public_id: 'img' } as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const uploadStub = sandbox
+      .stub(cloudinary.uploader, 'upload')
+      .resolves({ public_id: 'img' } as any)
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     await service.uploadImage('path/to/image.jpg')
     assert.isTrue(uploadStub.calledOnce)
@@ -49,8 +55,14 @@ test.group('CloudinaryService', (group) => {
 
   test('uploadVideo passes resource_type: video', async ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const uploadStub = sandbox.stub(cloudinary.uploader, 'upload').resolves({ public_id: 'vid' } as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const uploadStub = sandbox
+      .stub(cloudinary.uploader, 'upload')
+      .resolves({ public_id: 'vid' } as any)
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     await service.uploadVideo('path/to/video.mp4')
     assert.isTrue(uploadStub.calledOnce)
@@ -59,8 +71,14 @@ test.group('CloudinaryService', (group) => {
 
   test('uploadFile passes resource_type: raw', async ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const uploadStub = sandbox.stub(cloudinary.uploader, 'upload').resolves({ public_id: 'file' } as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const uploadStub = sandbox
+      .stub(cloudinary.uploader, 'upload')
+      .resolves({ public_id: 'file' } as any)
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     await service.uploadFile('path/to/file.pdf')
     assert.isTrue(uploadStub.calledOnce)
@@ -69,8 +87,14 @@ test.group('CloudinaryService', (group) => {
 
   test('upload methods merge custom options', async ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const uploadStub = sandbox.stub(cloudinary.uploader, 'upload').resolves({ public_id: 'img' } as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const uploadStub = sandbox
+      .stub(cloudinary.uploader, 'upload')
+      .resolves({ public_id: 'img' } as any)
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     await service.uploadImage('path/to/image.jpg', { folder: 'avatars', public_id: 'avatar' })
     assert.deepEqual(uploadStub.firstCall.args[1], {
@@ -82,8 +106,14 @@ test.group('CloudinaryService', (group) => {
 
   test('transformUrl delegates to cloudinary.url()', ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const urlStub = sandbox.stub(cloudinary, 'url').returns('https://res.cloudinary.com/demo/image/upload/sample.jpg')
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const urlStub = sandbox
+      .stub(cloudinary, 'url')
+      .returns('https://res.cloudinary.com/demo/image/upload/sample.jpg')
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     service.transformUrl('sample', { width: 300 })
     assert.isTrue(urlStub.calledOnce)
@@ -94,7 +124,11 @@ test.group('CloudinaryService', (group) => {
   test('signedUrl sets sign_url: true', ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
     const urlStub = sandbox.stub(cloudinary, 'url').returns('https://signed.url')
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     service.signedUrl('private_img')
     assert.isTrue(urlStub.calledOnce)
@@ -104,7 +138,11 @@ test.group('CloudinaryService', (group) => {
   test('signedUrl converts Date expiresAt to unix seconds', ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
     const urlStub = sandbox.stub(cloudinary, 'url').returns('https://signed.url')
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     const expiresAt = new Date('2030-01-01T00:00:00Z')
     service.signedUrl('private_img', { expiresAt })
@@ -117,7 +155,11 @@ test.group('CloudinaryService', (group) => {
   test('signedUrl passes numeric expiresAt directly', ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
     const urlStub = sandbox.stub(cloudinary, 'url').returns('https://signed.url')
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     service.signedUrl('private_img', { expiresAt: 1893456000 })
     assert.deepEqual(urlStub.firstCall.args[1], {
@@ -129,7 +171,11 @@ test.group('CloudinaryService', (group) => {
   test('uploadStream delegates to cloudinary.uploader.upload_stream', ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
     const streamStub = sandbox.stub(cloudinary.uploader, 'upload_stream').returns({} as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     service.uploadStream({ folder: 'uploads' })
     assert.isTrue(streamStub.calledOnce)
@@ -138,8 +184,14 @@ test.group('CloudinaryService', (group) => {
 
   test('destroy defaults resource_type to image', async ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const destroyStub = sandbox.stub(cloudinary.uploader, 'destroy').resolves({ result: 'ok' } as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const destroyStub = sandbox
+      .stub(cloudinary.uploader, 'destroy')
+      .resolves({ result: 'ok' } as any)
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     await service.destroy('old_image')
     assert.isTrue(destroyStub.calledOnce)
@@ -149,8 +201,14 @@ test.group('CloudinaryService', (group) => {
 
   test('destroy merges custom options', async ({ assert }) => {
     sandbox.stub(cloudinary, 'config')
-    const destroyStub = sandbox.stub(cloudinary.uploader, 'destroy').resolves({ result: 'ok' } as any)
-    const service = new CloudinaryService({ cloud_name: 'demo', api_key: 'key', api_secret: 'secret' })
+    const destroyStub = sandbox
+      .stub(cloudinary.uploader, 'destroy')
+      .resolves({ result: 'ok' } as any)
+    const service = new CloudinaryService({
+      cloud_name: 'demo',
+      api_key: 'key',
+      api_secret: 'secret',
+    })
 
     await service.destroy('old_video', { resource_type: 'video', invalidate: true })
     assert.deepEqual(destroyStub.firstCall.args[1], { resource_type: 'video', invalidate: true })

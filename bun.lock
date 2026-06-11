@@ -24,6 +24,7 @@
         "cross-env": "^10.1.0",
         "edge.js": "^6.0.0",
         "eslint": "^10.0.3",
+        "flydrive": "^2.1.0",
         "prettier": "^3.8.1",
         "release-it": "^19.2.4",
         "sinon": "^22.0.0",
@@ -34,10 +35,12 @@
         "@adonisjs/assembler": "^8.0.0",
         "@adonisjs/core": "^7.0.0",
         "edge.js": "^6.0.0",
+        "flydrive": "^2.0.0",
       },
       "optionalPeers": [
         "@adonisjs/assembler",
         "edge.js",
+        "flydrive",
       ],
     },
   },
@@ -737,6 +740,8 @@
     "flatted": ["flatted@3.4.2", "", {}, "sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA=="],
 
     "flattie": ["flattie@1.1.1", "", {}, "sha512-9UbaD6XdAL97+k/n+N7JwX46K/M6Zc6KcFYskrYL8wbBV/Uyk0CTAMY0VT+qiK5PM7AIc9aTWYtq65U7T+aCNQ=="],
+
+    "flydrive": ["flydrive@2.1.0", "", { "dependencies": { "@humanwhocodes/retry": "^0.4.3", "@poppinss/utils": "^7.0.0-next.6", "etag": "^1.8.1", "mime-types": "^3.0.2" }, "peerDependencies": { "@aws-sdk/client-s3": "^3.577.0", "@aws-sdk/s3-request-presigner": "^3.577.0", "@google-cloud/storage": "^7.10.2" }, "optionalPeers": ["@aws-sdk/client-s3", "@aws-sdk/s3-request-presigner", "@google-cloud/storage"] }, "sha512-464Y3vfAZKI3h+LodtjjFMnMxiItyHTKVGzfb2RBYzPfFl1gG7/RstlXH7bhUgB34h44lO9Cm4ZDW8UEk6Jd5g=="],
 
     "foreground-child": ["foreground-child@3.3.1", "", { "dependencies": { "cross-spawn": "^7.0.6", "signal-exit": "^4.0.1" } }, "sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw=="],
 

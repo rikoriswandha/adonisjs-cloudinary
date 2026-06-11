@@ -32,7 +32,12 @@
     "version": "npm run build",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["adonisjs", "cloudinary", "media", "upload"],
+  "keywords": [
+    "adonisjs",
+    "cloudinary",
+    "media",
+    "upload"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -52,6 +57,7 @@
     "cross-env": "^10.1.0",
     "eslint": "^10.0.3",
     "edge.js": "^6.0.0",
+    "flydrive": "^2.1.0",
     "prettier": "^3.8.1",
     "release-it": "^19.2.4",
     "sinon": "^22.0.0",
@@ -64,13 +70,17 @@
   "peerDependencies": {
     "@adonisjs/core": "^7.0.0",
     "@adonisjs/assembler": "^8.0.0",
-    "edge.js": "^6.0.0"
+    "edge.js": "^6.0.0",
+    "flydrive": "^2.0.0"
   },
   "peerDependenciesMeta": {
     "@adonisjs/assembler": {
       "optional": true
     },
     "edge.js": {
+      "optional": true
+    },
+    "flydrive": {
       "optional": true
     }
   },

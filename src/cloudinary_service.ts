@@ -9,7 +9,12 @@
 */
 
 import { v2 as cloudinary } from 'cloudinary'
-import type { UploadApiOptions, UploadApiResponse, UploadStream, TransformationOptions } from 'cloudinary'
+import type {
+  UploadApiOptions,
+  UploadApiResponse,
+  UploadStream,
+  TransformationOptions,
+} from 'cloudinary'
 import type { ConfigOptions } from './types.js'
 
 /**
@@ -106,4 +111,3 @@ export class CloudinaryService {
     })
   }
 }
-
