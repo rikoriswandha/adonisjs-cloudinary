@@ -14,4 +14,11 @@
 
 import type Configure from '@adonisjs/core/commands/configure'
 
-export async function configure(_command: Configure) {}
+export async function configure(command: Configure) {
+  const codemods = await command.createCodemods()
+
+  await codemods.makeUsingStub(command.stubsRoot, 'config/cloudinary.stub', {})
+  await codemods.updateRcFile((rcFile) => {
+    rcFile.addProvider('@rikology/adonisjs-cloudinary/cloudinary_provider')
+  })
+}

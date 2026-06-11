@@ -1,0 +1,25 @@
+import env from '#start/env'
+import { defineConfig } from '@rikology/adonisjs-cloudinary'
+
+export default defineConfig({
+  /**
+   * Cloudinary cloud name.
+   * Get yours from https://cloudinary.com/console
+   */
+  cloudName: env.get('CLOUDINARY_CLOUD_NAME'),
+
+  /**
+   * Cloudinary API key.
+   */
+  apiKey: env.get('CLOUDINARY_API_KEY'),
+
+  /**
+   * Cloudinary API secret.
+   */
+  apiSecret: env.get('CLOUDINARY_API_SECRET'),
+
+  /**
+   * Whether to use HTTPS URLs.
+   */
+  secure: true,
+})
