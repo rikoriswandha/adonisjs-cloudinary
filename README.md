@@ -1,130 +1,267 @@
-# AdonisJS package starter kit
+# @rikology/adonisjs-cloudinary
 
-> [!note]
-> This starter kit targets **AdonisJS v7**
+Cloudinary integration for AdonisJS v7 — upload, transform, and deliver media through the Cloudinary v2 SDK, with first-class IoC container support, Edge templating helpers, and an optional FlyDrive bridge.
 
-> A boilerplate for creating AdonisJS packages
+## Installation
 
-This repo provides you with a starting point for creating AdonisJS packages. Of course, you can create a package from scratch with your folder structure and workflow. However, using this starter kit can speed up the process, as you have fewer decisions to make.
-
-## Setup
-
-- Clone the repo on your computer, or use `giget` to download this repo without the Git history.
-  ```sh
-  npx giget@latest gh:adonisjs/pkg-starter-kit
-  ```
-- Install dependencies.
-- Update the `package.json` file and define the `name`, `description`, `keywords`, and `author` properties.
-- The repo is configured with an MIT license. Feel free to change that if you are not publishing under the MIT license.
-
-## Folder structure
-
-The starter kit mimics the folder structure of the official packages. Feel free to rename files and folders as per your requirements.
-
-```
-├── providers
-├── src
-├── bin
-├── stubs
-├── configure.ts
-├── index.ts
-├── LICENSE.md
-├── package.json
-├── README.md
-├── tsconfig.json
-├── tsnode.esm.js
+```sh
+bun add @rikology/adonisjs-cloudinary
+node ace configure @rikology/adonisjs-cloudinary
 ```
 
-- The `configure.ts` file exports the `configure` hook to configure the package using the `node ace configure` command.
-- The `index.ts` file is the main entry point of the package.
-- The `tsnode.esm.js` file runs TypeScript code using TS-Node + SWC. Please read the code comment in this file to learn more.
-- The `bin` directory contains the entry point file to run Japa tests.
-- Learn more about [the `providers` directory](./providers/README.md).
-- Learn more about [the `src` directory](./src/README.md).
-- Learn more about [the `stubs` directory](./stubs/README.md).
+The configure command will:
 
-### File system naming convention
+1. Create `config/cloudinary.ts` with your environment variables
+2. Register the `CloudinaryProvider` in `adonisrc.ts`
 
-We use `snake_case` naming conventions for the file system. The rule is enforced using ESLint. However, turn off the rule and use your preferred naming conventions.
+## Environment Variables
 
-## Peer dependencies
+Add the following to your `.env` file (values available from the [Cloudinary console](https://cloudinary.com/console)):
 
-The starter kit has a peer dependency on `@adonisjs/core@6`. Since you are creating a package for AdonisJS, you must make it against a specific version of the framework core.
+| Variable                     | Required | Description                              |
+| ---------------------------- | -------- | ---------------------------------------- |
+| `CLOUDINARY_CLOUD_NAME`      | Yes      | Your Cloudinary cloud name               |
+| `CLOUDINARY_API_KEY`         | Yes      | Your Cloudinary API key                  |
+| `CLOUDINARY_API_SECRET`      | Yes      | Your Cloudinary API secret               |
 
-If your package needs Lucid to be functional, you may install `@adonisjs/lucid` as a development dependency and add it to the list of `peerDependencies`.
+Make sure these are also listed in your `.env.types` or `env.ts` file so AdonisJS can validate them at boot.
 
-As a rule of thumb, packages installed in the user application should be part of the `peerDependencies` of your package and not the main dependency.
+## Configuration
 
-For example, if you install `@adonisjs/core` as a main dependency, then essentially, you are importing a separate copy of `@adonisjs/core` and not sharing the one from the user application. Here is a great article explaining [peer dependencies](https://blog.bitsrc.io/understanding-peer-dependencies-in-javascript-dbdb4ab5a7be).
+The configure command generates `config/cloudinary.ts`:
 
-## Published files
+```ts
+import env from '#start/env'
+import { defineConfig } from '@rikology/adonisjs-cloudinary'
 
-Instead of publishing your repo's source code to npm, you must cherry-pick files and folders to publish only the required files.
-
-The cherry-picking uses the `files` property inside the `package.json` file. By default, we publish the following files and folders.
-
-```json
-{
-  "files": [
-    "build/src",
-    "build/providers",
-    "build/stubs",
-    "build/index.d.ts",
-    "build/index.js",
-    "build/configure.d.ts",
-    "build/configure.js"
-  ]
-}
+export default defineConfig({
+  cloudName: env.get('CLOUDINARY_CLOUD_NAME'),
+  apiKey: env.get('CLOUDINARY_API_KEY'),
+  apiSecret: env.get('CLOUDINARY_API_SECRET'),
+  secure: true,
+})
 ```
 
-If you create additional folders or files, mention them inside the `files` array.
+`defineConfig` validates required fields and maps the camelCase keys you write to the snake_case format the Cloudinary SDK expects.
 
-## Exports
+## Usage
 
-[Node.js Subpath exports](https://nodejs.org/api/packages.html#subpath-exports) allows you to define the exports of your package regardless of the folder structure. This starter kit defines the following exports.
+### Dependency Injection
 
-```json
-{
-  "exports": {
-    ".": "./build/index.js",
-    "./types": "./build/src/types.js"
+The `CloudinaryService` is bound to the IoC container as `cloudinary`. Inject it anywhere using `@inject()`:
+
+```ts
+import { inject } from '@adonisjs/core'
+import type { CloudinaryService } from '@rikology/adonisjs-cloudinary'
+
+@inject()
+export default class UploadsController {
+  constructor(protected cloudinary: CloudinaryService) {}
+
+  async store({ request, response }) {
+    const file = request.file('avatar')!
+
+    const result = await this.cloudinary.uploadImage(file.tmpPath!, {
+      folder: 'avatars',
+      transformation: { width: 200, height: 200, crop: 'fill' },
+    })
+
+    return response.ok({ url: result.secure_url, publicId: result.public_id })
   }
 }
 ```
 
-- The dot `.` export is the main export.
-- The `./types` exports all the types defined inside the `./build/src/types.js` file (the compiled output).
+### Edge Templates
 
-Feel free to change the exports as per your requirements.
+The provider registers an `cloudinaryUrl` global in Edge when `edge.js` is installed. Use it to generate transformed delivery URLs directly in your templates:
 
-## Testing
+```edge
+<img src="{{ cloudinaryUrl('avatars/photo', { width: 200, height: 200, crop: 'fill' }) }}" alt="Avatar" />
+```
 
-We configure the [Japa test runner](https://japa.dev/) with this starter kit. Japa is used in AdonisJS applications as well. Just run one of the following commands to execute tests.
+The helper is not registered in API-only apps that don't use Edge — the provider handles this gracefully.
 
-- `npm run test`: This command will first lint the code using ESlint and then run tests and report the test coverage using [c8](https://github.com/bcoe/c8).
-- `npm run quick:test`: Runs only the tests without linting or coverage reporting.
+### Direct Container Resolution
 
-The starter kit also has a Github workflow file to run tests using Github Actions. The tests are executed against `Node.js 20.x` and `Node.js 21.x` versions on both Linux and Windows. Feel free to edit the workflow file in the `.github/workflows` directory.
+You can also resolve the service from the container outside of controllers:
 
-## TypeScript workflow
+```ts
+const cloudinary = await app.container.make('cloudinary')
+const url = cloudinary.transformUrl('my-folder/my-image', { width: 500, crop: 'limit' })
+```
 
-- The starter kit uses [tsc](https://www.typescriptlang.org/docs/handbook/compiler-options.html) for compiling the TypeScript to JavaScript when publishing the package.
-- [TS-Node](https://typestrong.org/ts-node/) and [SWC](https://swc.rs/) are used to run tests without compiling the source code.
-- The `tsconfig.json` file is extended from [`@adonisjs/tsconfig`](https://github.com/adonisjs/tooling-config/tree/main/packages/typescript-config) and uses the `NodeNext` module system. Meaning the packages are written using ES modules.
-- You can perform type checking without compiling the source code using the `npm run type check` script.
+## API Reference
 
-Feel free to explore the `tsconfig.json` file for all the configured options.
+### `CloudinaryService`
 
-## ESLint and Prettier setup
+All methods delegate to the Cloudinary v2 SDK.
 
-The starter kit configures ESLint and Prettier
-using our [shared config](https://github.com/adonisjs/tooling-config/tree/main/packages).
-ESLint configuration is stored within the `eslint.config.js` file.
-Prettier configuration is stored within the `package.json` file.
-Feel free to change the configuration, use custom plugins, or remove both tools altogether.
+| Method                                                       | Description                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------ |
+| `sdk`                                                        | Raw `cloudinary` v2 object for direct SDK calls        |
+| `uploadImage(file, options?)`                                | Upload with `resource_type: 'image'`                   |
+| `uploadVideo(file, options?)`                                | Upload with `resource_type: 'video'`                   |
+| `uploadFile(file, options?)`                                 | Upload with `resource_type: 'raw'`                     |
+| `transformUrl(publicId, transformations?)`                   | Generate a delivery URL with optional transformations   |
+| `signedUrl(publicId, options?)`                              | Generate a signed URL, optionally with `expiresAt`     |
+| `uploadStream(options?)`                                     | Return a `cloudinary.uploader.upload_stream()` stream   |
+| `destroy(publicId, options?)`                                | Delete an asset (defaults `resource_type: 'image'`)    |
 
-## Using Stale bot
+#### `uploadImage` / `uploadVideo` / `uploadFile`
 
-The [Stale bot](https://github.com/apps/stale) is a Github application that automatically marks issues and PRs as stale and closes after a specific duration of inactivity.
+```ts
+const result = await cloudinary.uploadImage('/path/to/file.jpg', {
+  folder: 'uploads',
+  public_id: 'custom-name',
+  tags: ['profile'],
+})
 
-Feel free to delete the `.github/stale.yml` and `.github/lock.yml` files if you decide not to use the Stale bot.
+// result.secure_url — the uploaded asset URL
+// result.public_id — the Cloudinary public ID
+```
+
+All three methods accept the full range of [Cloudinary upload options](https://cloudinary.com/documentation/image_upload_api_reference#upload).
+
+#### `transformUrl`
+
+```ts
+const url = cloudinary.transformUrl('my-image', {
+  width: 300,
+  height: 200,
+  crop: 'fill',
+  gravity: 'face',
+  radius: 'max',
+})
+
+// https://res.cloudinary.com/demo/image/upload/c_fill,g_face,h_200,r_max,w_300/my-image
+```
+
+Accepts the full [Cloudinary transformation options](https://cloudinary.com/documentation/transformation_reference) object.
+
+#### `signedUrl`
+
+```ts
+// Signed URL that expires in 1 hour
+const url = cloudinary.signedUrl('private-doc', {
+  expiresAt: Date.now() / 1000 + 3600,
+})
+```
+
+Pass `expiresAt` as a Unix timestamp (seconds) or a `Date` object.
+
+#### `destroy`
+
+```ts
+await cloudinary.destroy('my-folder/my-image')
+
+// For non-image assets, specify the resource type:
+await cloudinary.destroy('my-folder/my-video', { resource_type: 'video' })
+```
+
+### Standalone Helpers
+
+For use cases outside the AdonisJS container (scripts, workers, etc.):
+
+```ts
+import { createCloudinaryService, transformUrl } from '@rikology/adonisjs-cloudinary'
+
+// Create a service directly
+const cloudinary = createCloudinaryService({
+  cloudName: 'demo',
+  apiKey: '123456',
+  apiSecret: 'secret',
+})
+
+// One-shot URL generation
+const url = transformUrl(
+  'my-image',
+  { cloudName: 'demo', apiKey: '123456', apiSecret: 'secret' },
+  { width: 200, crop: 'thumb' }
+)
+```
+
+## Drive Bridge
+
+An optional FlyDrive driver is available for apps that use `@adonisjs/drive` or `flydrive`. It wraps `CloudinaryService` and maps FlyDrive operations to Cloudinary API calls.
+
+### Setup
+
+Register the driver in `config/drive.ts`:
+
+```ts
+import env from '#start/env'
+import { defineConfig } from '@adonisjs/drive'
+import { CloudinaryDrive } from '@rikology/adonisjs-cloudinary'
+import cloudinaryService from '@adonisjs/main' // or resolve via container
+
+export default defineConfig({
+  disks: {
+    cloudinary: {
+      driver: new CloudinaryDrive(cloudinaryService),
+      visibility: 'public',
+    },
+  },
+})
+```
+
+Or resolve the service from the IoC container:
+
+```ts
+const cloudinary = await app.container.make('cloudinary')
+const drive = new CloudinaryDrive(cloudinary)
+```
+
+### Supported Operations
+
+| Method             | Behavior                                                        |
+| ------------------ | --------------------------------------------------------------- |
+| `exists(key)`      | Searches via the Admin API (rate-limited, avoid in hot paths)   |
+| `getUrl(key)`      | Returns the delivery URL via `transformUrl`                     |
+| `getSignedUrl`     | Delegates to `signedUrl` with `expiresIn` → timestamp math      |
+| `put(key, data)`   | Base64-encodes contents and uploads as a data URI               |
+| `putStream(key)`   | Pipes a stream through `uploadStream`                           |
+| `move(src, dest)`  | Calls `cloudinary.uploader.rename`                              |
+| `delete(key)`      | Delegates to `destroy`                                          |
+| `deleteAll(prefix)`| Lists resources by prefix, deletes each                         |
+| `listAll(prefix)`  | Returns `DriveFile` objects by prefix                           |
+| `getMetaData(key)` | Returns `contentType`, `contentLength`, `lastModified`          |
+
+### Unsupported Operations
+
+| Method               | Reason                                                        |
+| -------------------- | ------------------------------------------------------------- |
+| `get` / `getStream` / `getBytes` | Cloudinary is not a byte-level storage backend               |
+| `copy`               | Cloudinary has no server-side copy API                        |
+| `setVisibility`      | Visibility is managed via access-control rules, not per-file |
+| `getSignedUploadUrl` | Use Cloudinary upload presets or direct SDK calls instead     |
+
+## Advanced: Raw SDK Access
+
+If you need functionality not covered by the service methods, access the underlying SDK directly:
+
+```ts
+const cloudinary = await app.container.make('cloudinary')
+
+// Admin API
+const resources = await cloudinary.sdk.api.resources({
+  type: 'upload',
+  prefix: 'my-folder/',
+  max_results: 50,
+})
+
+// Search API
+const results = await cloudinary.sdk.search
+  .expression('resource_type:image AND tags=featured')
+  .sort_by('created_at', 'desc')
+  .max_results(30)
+  .execute()
+
+// Upload presets
+await cloudinary.sdk.uploader.upload(file, { upload_preset: 'my-preset' })
+```
+
+The `sdk` getter returns the full `cloudinary` v2 object — every SDK method is available.
+
+## License
+
+[MIT](LICENSE.md)
