@@ -21,7 +21,7 @@ The repository is a fresh `pkg-starter-kit` with the following:
 
 | Task | File(s) | Notes |
 |------|---------|-------|
-| Rename package | `package.json` | Change `name` from `pkg-starter-kit` to `adonisjs-cloudinary` |
+| Rename package | `package.json` | Change `name` from `pkg-starter-kit` to `@rikology/adonisjs-cloudinary` |
 | Add runtime dependency | `package.json` | Add `cloudinary: ^2.x` to `dependencies` |
 | Add `cloudinary` type export | `package.json` | Ensure `./types` export resolves; may need to add `./cloudinary` or `./drive` subpath exports later |
 | Update keywords | `package.json` | Add `adonisjs`, `cloudinary`, `media`, `upload` |
@@ -94,7 +94,7 @@ The repository is a fresh `pkg-starter-kit` with the following:
 
 ### Phase 5: Configure Hook & Stubs
 
-**Goal**: Make `node ace configure adonisjs-cloudinary` generate the config file and register the provider.
+**Goal**: Make `node ace configure @rikology/adonisjs-cloudinary` generate the config file and register the provider.
 
 | Task | File(s) | Notes |
 |------|---------|-------|
@@ -106,7 +106,7 @@ The repository is a fresh `pkg-starter-kit` with the following:
 **Config stub content**:
 ```ts
 import env from '#start/env'
-import { defineConfig } from 'adonisjs-cloudinary'
+import { defineConfig } from '@rikology/adonisjs-cloudinary'
 
 export default defineConfig({
   cloudName: env.get('CLOUDINARY_CLOUD_NAME'),
@@ -187,7 +187,7 @@ These are thin convenience wrappers. Keep them minimal to avoid duplicating the 
 
 | Section | Content |
 |---------|---------|
-| Installation | `bun add adonisjs-cloudinary`, `node ace configure adonisjs-cloudinary` |
+| Installation | `bun add @rikology/adonisjs-cloudinary`, `node ace configure @rikology/adonisjs-cloudinary` |
 | Env variables | Table of `CLOUDINARY_*` vars with required/optional flags |
 | Usage (DI) | `@inject()` controller example with `uploadImage` |
 | Usage (Edge) | `cloudinaryUrl()` global example with transformations |
