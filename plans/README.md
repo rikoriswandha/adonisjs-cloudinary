@@ -16,7 +16,7 @@ done.
 | Plan | Title                                                      | Priority | Effort | Depends on | Status |
 | ---- | ---------------------------------------------------------- | -------- | ------ | ---------- | ------ |
 | 001  | Fix prettier/lint errors blocking every CI gate            | P1       | S      | —          | DONE   |
-| 002  | Emit and export the provider so installs can load it       | P1       | M      | 001        | TODO   |
+| 002  | Emit and export the provider so installs can load it       | P1       | M      | 001        | DONE   |
 | 003  | Isolate the FlyDrive bridge behind a `./drive` subpath     | P1       | M      | 001, 002   | TODO   |
 | 004  | Add publish metadata + `repository` for provenance publish | P1       | S      | —          | TODO   |
 | 005  | Make CI installs reproducible (committed lockfile)         | P2       | S      | 001        | TODO   |

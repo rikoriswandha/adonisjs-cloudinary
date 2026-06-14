@@ -14,7 +14,11 @@
   "main": "build/index.js",
   "exports": {
     ".": "./build/index.js",
-    "./types": "./build/src/types.js"
+    "./types": "./build/src/types.js",
+    "./cloudinary_provider": {
+      "types": "./build/providers/cloudinary_provider.d.ts",
+      "default": "./build/providers/cloudinary_provider.js"
+    }
   },
   "scripts": {
     "copy:templates": "copyfiles \"stubs/**/*.stub\" build",
@@ -84,14 +88,11 @@
       "optional": true
     }
   },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
   "tsdown": {
     "entry": [
       "./index.ts",
-      "./configure.ts"
+      "./configure.ts",
+      "./providers/cloudinary_provider.ts"
     ],
     "outDir": "./build",
     "clean": true,

@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 import { test } from '@japa/runner'
 import { configure } from '../configure.js'
 
@@ -39,5 +41,13 @@ test.group('Configure hook', () => {
       method: 'addProvider',
       provider: '@rikology/adonisjs-cloudinary/cloudinary_provider',
     })
+  })
+})
+
+test.group('Provider package contract', () => {
+  test('registered provider subpath is declared in package exports', async ({ assert }) => {
+    const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf-8'))
+    // configure.ts registers '@rikology/adonisjs-cloudinary/cloudinary_provider'
+    assert.isDefined(pkg.exports['./cloudinary_provider'])
   })
 })
