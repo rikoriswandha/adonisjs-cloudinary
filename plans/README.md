@@ -20,7 +20,7 @@ done.
 | 003  | Isolate the FlyDrive bridge behind a `./drive` subpath     | P1       | M      | 001, 002   | DONE   |
 | 004  | Add publish metadata + `repository` for provenance publish | P1       | S      | —          | DONE   |
 | 005  | Make CI installs reproducible (committed lockfile)         | P2       | S      | 001        | DONE   |
-| 006  | Fix the README Drive-bridge usage example                  | P3       | S      | —          | TODO   |
+| 006  | Fix the README Drive-bridge usage example                  | P3       | S      | —          | DONE   |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 

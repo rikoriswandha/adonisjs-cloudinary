@@ -195,12 +195,18 @@ Register the driver in `config/drive.ts`:
 import env from '#start/env'
 import { defineConfig } from '@adonisjs/drive'
 import { CloudinaryDrive } from '@rikology/adonisjs-cloudinary/drive'
-import cloudinaryService from '@adonisjs/main' // or resolve via container
+import { createCloudinaryService } from '@rikology/adonisjs-cloudinary'
+
+const cloudinary = createCloudinaryService({
+  cloudName: env.get('CLOUDINARY_CLOUD_NAME'),
+  apiKey: env.get('CLOUDINARY_API_KEY'),
+  apiSecret: env.get('CLOUDINARY_API_SECRET'),
+})
 
 export default defineConfig({
   disks: {
     cloudinary: {
-      driver: new CloudinaryDrive(cloudinaryService),
+      driver: new CloudinaryDrive(cloudinary),
       visibility: 'public',
     },
   },
