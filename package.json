@@ -14,7 +14,6 @@
   "main": "build/index.js",
   "exports": {
     ".": "./build/index.js",
-    "./types": "./build/src/types.js",
     "./cloudinary_provider": {
       "types": "./build/providers/cloudinary_provider.d.ts",
       "default": "./build/providers/cloudinary_provider.js"
@@ -23,6 +22,9 @@
       "types": "./build/src/drive/cloudinary_drive.d.ts",
       "default": "./build/src/drive/cloudinary_drive.js"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "copy:templates": "copyfiles \"stubs/**/*.stub\" build",
