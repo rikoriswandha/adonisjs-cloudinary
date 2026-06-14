@@ -189,6 +189,8 @@ An optional FlyDrive driver is available for apps that use `@adonisjs/drive` or 
 
 ### Setup
 
+> The Drive bridge requires the optional `flydrive` peer dependency (or `@adonisjs/drive`, which wraps it). Install one of them in your host app before registering the driver.
+
 Register the driver in `config/drive.ts`:
 
 ```ts
@@ -203,14 +205,18 @@ const cloudinary = createCloudinaryService({
   apiSecret: env.get('CLOUDINARY_API_SECRET'),
 })
 
-export default defineConfig({
-  disks: {
-    cloudinary: {
-      driver: new CloudinaryDrive(cloudinary),
-      visibility: 'public',
-    },
+const driveConfig = defineConfig({
+  default: 'cloudinary',
+  services: {
+    cloudinary: () => new CloudinaryDrive(cloudinary),
   },
 })
+
+export default driveConfig
+
+declare module '@adonisjs/drive/types' {
+  export interface DriveDisks extends InferDriveDisks<typeof driveConfig> {}
+}
 ```
 
 > The Drive bridge requires the optional `flydrive` peer dependency. Install it (`bun add flydrive`) only if you use this bridge; the rest of the package works without it.
