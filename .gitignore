@@ -7,3 +7,6 @@ coverage
 build
 dist
 package-lock.json
+
+# codedb local snapshot
+codedb.snapshot
