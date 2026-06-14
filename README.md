@@ -4,8 +4,25 @@ Cloudinary integration for AdonisJS v7 — upload, transform, and deliver media 
 
 ## Installation
 
+Install the package with your preferred package manager:
+
 ```sh
+# npm
+npm install @rikology/adonisjs-cloudinary
+
+# pnpm
+pnpm add @rikology/adonisjs-cloudinary
+
+# yarn
+yarn add @rikology/adonisjs-cloudinary
+
+# bun
 bun add @rikology/adonisjs-cloudinary
+```
+
+Then run the AdonisJS configure command:
+
+```sh
 node ace configure @rikology/adonisjs-cloudinary
 ```
 
@@ -24,7 +41,17 @@ Add the following to your `.env` file (values available from the [Cloudinary con
 | `CLOUDINARY_API_KEY`    | Yes      | Your Cloudinary API key    |
 | `CLOUDINARY_API_SECRET` | Yes      | Your Cloudinary API secret |
 
-Make sure these are also listed in your `.env.types` or `env.ts` file so AdonisJS can validate them at boot.
+Make sure these variables are also registered in your AdonisJS env validator. In a standard AdonisJS v7 app this is `start/env.ts` (imported as `#start/env` in the generated config). For example:
+
+```ts
+import { Env } from '@adonisjs/core/env'
+
+export default await Env.create(new URL('../', import.meta.url), {
+  CLOUDINARY_CLOUD_NAME: Env.schema.string(),
+  CLOUDINARY_API_KEY: Env.schema.string(),
+  CLOUDINARY_API_SECRET: Env.schema.string(),
+})
+```
 
 ## Configuration
 

@@ -23,7 +23,7 @@ done.
 | 005  | Make CI installs reproducible (committed lockfile)         | P2       | S      | 001        | DONE   |
 | 006  | Fix the README Drive-bridge usage example                  | P3       | S      | —          | DONE   |
 | 007  | Fix README Drive-bridge setup to AdonisJS Drive v7 pattern | P2       | S      | —          | DONE   |
-| 008  | Improve README installation and env-variable guidance      | P2       | S      | —          | TODO   |
+| 008  | Improve README installation and env-variable guidance      | P2       | S      | —          | DONE   |
 | 009  | Add CONTRIBUTING.md and GitHub issue templates             | P2       | S      | —          | TODO   |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
