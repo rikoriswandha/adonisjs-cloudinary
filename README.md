@@ -1,10 +1,34 @@
 # @rikology/adonisjs-cloudinary
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE.md)
+[![AdonisJS v7](https://img.shields.io/badge/AdonisJS-v7-purple.svg)](https://adonisjs.com)
+
 Cloudinary integration for AdonisJS v7 — upload, transform, and deliver media through the Cloudinary v2 SDK, with first-class IoC container support, Edge templating helpers, and an optional FlyDrive bridge.
 
-## Installation
+## Features
 
-Install the package with your preferred package manager:
+- 🚀 **Typed service** wrapping the Cloudinary v2 SDK, injectable anywhere via the IoC container
+- 📸 **Upload helpers** for images, video, and raw files with a single call
+- 🎨 **URL transformations** generated synchronously, including in Edge templates
+- 🔐 **Signed/expiring URLs** with `Date` or Unix-timestamp expiration
+- 🗄️ **Optional FlyDrive bridge** to use Cloudinary as a Drive disk
+- 🧩 **Zero-config Edge helper** that registers itself when Edge is installed (and stays out of the way in API-only apps)
+- 📦 **Standalone helpers** for scripts, workers, and non-AdonisJS projects
+
+## Documentation
+
+| Topic | Document |
+| --- | --- |
+| Install, configure, first upload | [Getting Started](./docs/getting-started.md) |
+| `defineConfig`, config types, container binding | [Configuration](./docs/configuration.md) |
+| Full `CloudinaryService` method reference | [Service API](./docs/service-api.md) |
+| The `cloudinaryUrl` Edge global | [Edge Helpers](./docs/edge-helpers.md) |
+| Using Cloudinary as a FlyDrive disk | [Drive Bridge](./docs/drive-bridge.md) |
+| Scripts, workers, non-AdonisJS usage | [Standalone Helpers](./docs/standalone-helpers.md) |
+| Raw SDK, Admin/Search API, presets, multi-account | [Advanced](./docs/advanced.md) |
+| Avatars, galleries, signed URLs, cleanup | [Recipes](./docs/recipes.md) |
+
+## Installation
 
 ```sh
 # npm
@@ -26,14 +50,11 @@ Then run the AdonisJS configure command:
 node ace configure @rikology/adonisjs-cloudinary
 ```
 
-The configure command will:
+This creates `config/cloudinary.ts` and registers the `CloudinaryProvider` in `adonisrc.ts`.
 
-1. Create `config/cloudinary.ts` with your environment variables
-2. Register the `CloudinaryProvider` in `adonisrc.ts`
+## Environment variables
 
-## Environment Variables
-
-Add the following to your `.env` file (values available from the [Cloudinary console](https://cloudinary.com/console)):
+Add these to your `.env` (values from the [Cloudinary console](https://cloudinary.com/console)):
 
 | Variable                | Required | Description                |
 | ----------------------- | -------- | -------------------------- |
@@ -41,7 +62,7 @@ Add the following to your `.env` file (values available from the [Cloudinary con
 | `CLOUDINARY_API_KEY`    | Yes      | Your Cloudinary API key    |
 | `CLOUDINARY_API_SECRET` | Yes      | Your Cloudinary API secret |
 
-Make sure these variables are also registered in your AdonisJS env validator. In a standard AdonisJS v7 app this is `start/env.ts` (imported as `#start/env` in the generated config). For example:
+Register them in your env validator (`start/env.ts`):
 
 ```ts
 import { Env } from '@adonisjs/core/env'
@@ -53,29 +74,9 @@ export default await Env.create(new URL('../', import.meta.url), {
 })
 ```
 
-## Configuration
+## Quick start
 
-The configure command generates `config/cloudinary.ts`:
-
-```ts
-import env from '#start/env'
-import { defineConfig } from '@rikology/adonisjs-cloudinary'
-
-export default defineConfig({
-  cloudName: env.get('CLOUDINARY_CLOUD_NAME'),
-  apiKey: env.get('CLOUDINARY_API_KEY'),
-  apiSecret: env.get('CLOUDINARY_API_SECRET'),
-  secure: true,
-})
-```
-
-`defineConfig` validates required fields and maps the camelCase keys you write to the snake_case format the Cloudinary SDK expects.
-
-## Usage
-
-### Dependency Injection
-
-The `CloudinaryService` is bound to the IoC container as `cloudinary`. Inject it anywhere using `@inject()`:
+Inject the service and upload:
 
 ```ts
 import { inject } from '@adonisjs/core'
@@ -98,9 +99,7 @@ export default class UploadsController {
 }
 ```
 
-### Edge Templates
-
-The provider registers an `cloudinaryUrl` global in Edge when `edge.js` is installed. Use it to generate transformed delivery URLs directly in your templates:
+Render a transformed URL in Edge (the `cloudinaryUrl` global registers itself automatically):
 
 ```edge
 <img
@@ -109,22 +108,9 @@ The provider registers an `cloudinaryUrl` global in Edge when `edge.js` is insta
 />
 ```
 
-The helper is not registered in API-only apps that don't use Edge — the provider handles this gracefully.
+## Service API (summary)
 
-### Direct Container Resolution
-
-You can also resolve the service from the container outside of controllers:
-
-```ts
-const cloudinary = await app.container.make('cloudinary')
-const url = cloudinary.transformUrl('my-folder/my-image', { width: 500, crop: 'limit' })
-```
-
-## API Reference
-
-### `CloudinaryService`
-
-All methods delegate to the Cloudinary v2 SDK.
+The `CloudinaryService` is bound to the container as `cloudinary`. Full reference: [Service API](./docs/service-api.md).
 
 | Method                                     | Description                                           |
 | ------------------------------------------ | ----------------------------------------------------- |
@@ -137,92 +123,34 @@ All methods delegate to the Cloudinary v2 SDK.
 | `uploadStream(options?)`                   | Return a `cloudinary.uploader.upload_stream()` stream |
 | `destroy(publicId, options?)`              | Delete an asset (defaults `resource_type: 'image'`)   |
 
-#### `uploadImage` / `uploadVideo` / `uploadFile`
-
 ```ts
-const result = await cloudinary.uploadImage('/path/to/file.jpg', {
-  folder: 'uploads',
-  public_id: 'custom-name',
-  tags: ['profile'],
-})
-
-// result.secure_url — the uploaded asset URL
-// result.public_id — the Cloudinary public ID
-```
-
-All three methods accept the full range of [Cloudinary upload options](https://cloudinary.com/documentation/image_upload_api_reference#upload).
-
-#### `transformUrl`
-
-```ts
-const url = cloudinary.transformUrl('my-image', {
-  width: 300,
-  height: 200,
-  crop: 'fill',
-  gravity: 'face',
-  radius: 'max',
-})
-
-// https://res.cloudinary.com/demo/image/upload/c_fill,g_face,h_200,r_max,w_300/my-image
-```
-
-Accepts the full [Cloudinary transformation options](https://cloudinary.com/documentation/transformation_reference) object.
-
-#### `signedUrl`
-
-```ts
-// Signed URL that expires in 1 hour
+// Signed URL expiring in 1 hour
 const url = cloudinary.signedUrl('private-doc', {
   expiresAt: Date.now() / 1000 + 3600,
 })
 ```
 
-Pass `expiresAt` as a Unix timestamp (seconds) or a `Date` object.
-
-#### `destroy`
-
-```ts
-await cloudinary.destroy('my-folder/my-image')
-
-// For non-image assets, specify the resource type:
-await cloudinary.destroy('my-folder/my-video', { resource_type: 'video' })
-```
-
-### Standalone Helpers
-
-For use cases outside the AdonisJS container (scripts, workers, etc.):
+For scripts and workers without the container:
 
 ```ts
 import { createCloudinaryService, transformUrl } from '@rikology/adonisjs-cloudinary'
 
-// Create a service directly
 const cloudinary = createCloudinaryService({
   cloudName: 'demo',
   apiKey: '123456',
   apiSecret: 'secret',
 })
 
-// One-shot URL generation
-const url = transformUrl(
-  'my-image',
-  { cloudName: 'demo', apiKey: '123456', apiSecret: 'secret' },
-  { width: 200, crop: 'thumb' }
-)
+const url = transformUrl('my-image', { cloudName: 'demo', apiKey: 'k', apiSecret: 's' }, { width: 200 })
 ```
 
-## Drive Bridge
+See [Standalone Helpers](./docs/standalone-helpers.md).
 
-An optional FlyDrive driver is available for apps that use `@adonisjs/drive` or `flydrive`. It wraps `CloudinaryService` and maps FlyDrive operations to Cloudinary API calls.
+## Drive bridge
 
-### Setup
-
-> The Drive bridge requires the optional `flydrive` peer dependency (or `@adonisjs/drive`, which wraps it). Install one of them in your host app before registering the driver.
-
-Register the driver in `config/drive.ts`:
+An optional FlyDrive driver maps Drive operations onto Cloudinary API calls. It's imported from the `/drive` subpath so it never loads unless you use it:
 
 ```ts
-import env from '#start/env'
-import { defineConfig } from '@adonisjs/drive'
 import { CloudinaryDrive } from '@rikology/adonisjs-cloudinary/drive'
 import { createCloudinaryService } from '@rikology/adonisjs-cloudinary'
 
@@ -238,63 +166,22 @@ const driveConfig = defineConfig({
     cloudinary: () => new CloudinaryDrive(cloudinary),
   },
 })
-
-export default driveConfig
-
-declare module '@adonisjs/drive/types' {
-  export interface DriveDisks extends InferDriveDisks<typeof driveConfig> {}
-}
 ```
 
-> The Drive bridge requires the optional `flydrive` peer dependency. Install it (`bun add flydrive`) only if you use this bridge; the rest of the package works without it.
+> Requires the optional `flydrive` (or `@adonisjs/drive`) peer dependency. Cloudinary is a media platform, not a byte-level object store — see the [Drive Bridge](./docs/drive-bridge.md) guide for supported/unsupported operations.
 
-Or resolve the service from the IoC container:
+## Advanced
 
-```ts
-const cloudinary = await app.container.make('cloudinary')
-const drive = new CloudinaryDrive(cloudinary)
-```
-
-### Supported Operations
-
-| Method              | Behavior                                                      |
-| ------------------- | ------------------------------------------------------------- |
-| `exists(key)`       | Searches via the Admin API (rate-limited, avoid in hot paths) |
-| `getUrl(key)`       | Returns the delivery URL via `transformUrl`                   |
-| `getSignedUrl`      | Delegates to `signedUrl` with `expiresIn` → timestamp math    |
-| `put(key, data)`    | Base64-encodes contents and uploads as a data URI             |
-| `putStream(key)`    | Pipes a stream through `uploadStream`                         |
-| `move(src, dest)`   | Calls `cloudinary.uploader.rename`                            |
-| `delete(key)`       | Delegates to `destroy`                                        |
-| `deleteAll(prefix)` | Lists resources by prefix, deletes each                       |
-| `listAll(prefix)`   | Returns `DriveFile` objects by prefix                         |
-| `getMetaData(key)`  | Returns `contentType`, `contentLength`, `lastModified`        |
-
-### Unsupported Operations
-
-| Method                           | Reason                                                       |
-| -------------------------------- | ------------------------------------------------------------ |
-| `get` / `getStream` / `getBytes` | Cloudinary is not a byte-level storage backend               |
-| `copy`                           | Cloudinary has no server-side copy API                       |
-| `setVisibility`                  | Visibility is managed via access-control rules, not per-file |
-| `getSignedUploadUrl`             | Use Cloudinary upload presets or direct SDK calls instead    |
-
-## Advanced: Raw SDK Access
-
-If you need functionality not covered by the service methods, access the underlying SDK directly:
+Need something the wrappers don't cover? The raw SDK is one property away:
 
 ```ts
 const cloudinary = await app.container.make('cloudinary')
 
 // Admin API
-const resources = await cloudinary.sdk.api.resources({
-  type: 'upload',
-  prefix: 'my-folder/',
-  max_results: 50,
-})
+await cloudinary.sdk.api.resources({ type: 'upload', prefix: 'avatars/', max_results: 50 })
 
 // Search API
-const results = await cloudinary.sdk.search
+await cloudinary.sdk.search
   .expression('resource_type:image AND tags=featured')
   .sort_by('created_at', 'desc')
   .max_results(30)
@@ -304,8 +191,12 @@ const results = await cloudinary.sdk.search
 await cloudinary.sdk.uploader.upload(file, { upload_preset: 'my-preset' })
 ```
 
-The `sdk` getter returns the full `cloudinary` v2 object — every SDK method is available.
+See [Advanced](./docs/advanced.md) for Admin/Search API patterns, upload presets, multi-account strategies, and testing.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Contributions, issues, and feature requests are welcome.
 
 ## License
 
-[MIT](LICENSE.md)
+[MIT](./LICENSE.md) © Riko Riswandha Fahmi Prasetyo
