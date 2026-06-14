@@ -21,6 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - uses: oven-sh/setup-bun@v2
       - name: git config
         run: |
           git config user.name "${GITHUB_ACTOR}"
@@ -30,7 +31,7 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install
-        run: npm install
+        run: bun install --frozen-lockfile
       - name: Release
         run: npm run release -- --ci
         env:

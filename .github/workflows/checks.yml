@@ -13,20 +13,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - uses: oven-sh/setup-bun@v2
       - name: Install
-        run: npm install
+        run: bun install --frozen-lockfile
       - name: Run lint
         run: npm run lint
 
   typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - uses: oven-sh/setup-bun@v2
       - name: Install
-        run: npm install
+        run: bun install --frozen-lockfile
       - name: Run typecheck
         run: npm run typecheck
 
@@ -42,7 +43,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - uses: oven-sh/setup-bun@v2
       - name: Install
-        run: npm install
+        run: bun install --frozen-lockfile
       - name: Run tests
         run: npm test
