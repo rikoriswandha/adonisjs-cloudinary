@@ -194,7 +194,7 @@ Register the driver in `config/drive.ts`:
 ```ts
 import env from '#start/env'
 import { defineConfig } from '@adonisjs/drive'
-import { CloudinaryDrive } from '@rikology/adonisjs-cloudinary'
+import { CloudinaryDrive } from '@rikology/adonisjs-cloudinary/drive'
 import cloudinaryService from '@adonisjs/main' // or resolve via container
 
 export default defineConfig({
@@ -206,6 +206,8 @@ export default defineConfig({
   },
 })
 ```
+
+> The Drive bridge requires the optional `flydrive` peer dependency. Install it (`bun add flydrive`) only if you use this bridge; the rest of the package works without it.
 
 Or resolve the service from the IoC container:
 

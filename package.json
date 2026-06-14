@@ -18,6 +18,10 @@
     "./cloudinary_provider": {
       "types": "./build/providers/cloudinary_provider.d.ts",
       "default": "./build/providers/cloudinary_provider.js"
+    },
+    "./drive": {
+      "types": "./build/src/drive/cloudinary_drive.d.ts",
+      "default": "./build/src/drive/cloudinary_drive.js"
     }
   },
   "scripts": {
@@ -92,7 +96,8 @@
     "entry": [
       "./index.ts",
       "./configure.ts",
-      "./providers/cloudinary_provider.ts"
+      "./providers/cloudinary_provider.ts",
+      "./src/drive/cloudinary_drive.ts"
     ],
     "outDir": "./build",
     "clean": true,
