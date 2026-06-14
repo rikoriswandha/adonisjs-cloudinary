@@ -18,11 +18,11 @@ The configure command will:
 
 Add the following to your `.env` file (values available from the [Cloudinary console](https://cloudinary.com/console)):
 
-| Variable                     | Required | Description                              |
-| ---------------------------- | -------- | ---------------------------------------- |
-| `CLOUDINARY_CLOUD_NAME`      | Yes      | Your Cloudinary cloud name               |
-| `CLOUDINARY_API_KEY`         | Yes      | Your Cloudinary API key                  |
-| `CLOUDINARY_API_SECRET`      | Yes      | Your Cloudinary API secret               |
+| Variable                | Required | Description                |
+| ----------------------- | -------- | -------------------------- |
+| `CLOUDINARY_CLOUD_NAME` | Yes      | Your Cloudinary cloud name |
+| `CLOUDINARY_API_KEY`    | Yes      | Your Cloudinary API key    |
+| `CLOUDINARY_API_SECRET` | Yes      | Your Cloudinary API secret |
 
 Make sure these are also listed in your `.env.types` or `env.ts` file so AdonisJS can validate them at boot.
 
@@ -76,7 +76,10 @@ export default class UploadsController {
 The provider registers an `cloudinaryUrl` global in Edge when `edge.js` is installed. Use it to generate transformed delivery URLs directly in your templates:
 
 ```edge
-<img src="{{ cloudinaryUrl('avatars/photo', { width: 200, height: 200, crop: 'fill' }) }}" alt="Avatar" />
+<img
+  src="{{ cloudinaryUrl('avatars/photo', { width: 200, height: 200, crop: 'fill' }) }}"
+  alt="Avatar"
+/>
 ```
 
 The helper is not registered in API-only apps that don't use Edge — the provider handles this gracefully.
@@ -96,16 +99,16 @@ const url = cloudinary.transformUrl('my-folder/my-image', { width: 500, crop: 'l
 
 All methods delegate to the Cloudinary v2 SDK.
 
-| Method                                                       | Description                                            |
-| ------------------------------------------------------------ | ------------------------------------------------------ |
-| `sdk`                                                        | Raw `cloudinary` v2 object for direct SDK calls        |
-| `uploadImage(file, options?)`                                | Upload with `resource_type: 'image'`                   |
-| `uploadVideo(file, options?)`                                | Upload with `resource_type: 'video'`                   |
-| `uploadFile(file, options?)`                                 | Upload with `resource_type: 'raw'`                     |
-| `transformUrl(publicId, transformations?)`                   | Generate a delivery URL with optional transformations   |
-| `signedUrl(publicId, options?)`                              | Generate a signed URL, optionally with `expiresAt`     |
-| `uploadStream(options?)`                                     | Return a `cloudinary.uploader.upload_stream()` stream   |
-| `destroy(publicId, options?)`                                | Delete an asset (defaults `resource_type: 'image'`)    |
+| Method                                     | Description                                           |
+| ------------------------------------------ | ----------------------------------------------------- |
+| `sdk`                                      | Raw `cloudinary` v2 object for direct SDK calls       |
+| `uploadImage(file, options?)`              | Upload with `resource_type: 'image'`                  |
+| `uploadVideo(file, options?)`              | Upload with `resource_type: 'video'`                  |
+| `uploadFile(file, options?)`               | Upload with `resource_type: 'raw'`                    |
+| `transformUrl(publicId, transformations?)` | Generate a delivery URL with optional transformations |
+| `signedUrl(publicId, options?)`            | Generate a signed URL, optionally with `expiresAt`    |
+| `uploadStream(options?)`                   | Return a `cloudinary.uploader.upload_stream()` stream |
+| `destroy(publicId, options?)`              | Delete an asset (defaults `resource_type: 'image'`)   |
 
 #### `uploadImage` / `uploadVideo` / `uploadFile`
 
@@ -213,27 +216,27 @@ const drive = new CloudinaryDrive(cloudinary)
 
 ### Supported Operations
 
-| Method             | Behavior                                                        |
-| ------------------ | --------------------------------------------------------------- |
-| `exists(key)`      | Searches via the Admin API (rate-limited, avoid in hot paths)   |
-| `getUrl(key)`      | Returns the delivery URL via `transformUrl`                     |
-| `getSignedUrl`     | Delegates to `signedUrl` with `expiresIn` → timestamp math      |
-| `put(key, data)`   | Base64-encodes contents and uploads as a data URI               |
-| `putStream(key)`   | Pipes a stream through `uploadStream`                           |
-| `move(src, dest)`  | Calls `cloudinary.uploader.rename`                              |
-| `delete(key)`      | Delegates to `destroy`                                          |
-| `deleteAll(prefix)`| Lists resources by prefix, deletes each                         |
-| `listAll(prefix)`  | Returns `DriveFile` objects by prefix                           |
-| `getMetaData(key)` | Returns `contentType`, `contentLength`, `lastModified`          |
+| Method              | Behavior                                                      |
+| ------------------- | ------------------------------------------------------------- |
+| `exists(key)`       | Searches via the Admin API (rate-limited, avoid in hot paths) |
+| `getUrl(key)`       | Returns the delivery URL via `transformUrl`                   |
+| `getSignedUrl`      | Delegates to `signedUrl` with `expiresIn` → timestamp math    |
+| `put(key, data)`    | Base64-encodes contents and uploads as a data URI             |
+| `putStream(key)`    | Pipes a stream through `uploadStream`                         |
+| `move(src, dest)`   | Calls `cloudinary.uploader.rename`                            |
+| `delete(key)`       | Delegates to `destroy`                                        |
+| `deleteAll(prefix)` | Lists resources by prefix, deletes each                       |
+| `listAll(prefix)`   | Returns `DriveFile` objects by prefix                         |
+| `getMetaData(key)`  | Returns `contentType`, `contentLength`, `lastModified`        |
 
 ### Unsupported Operations
 
-| Method               | Reason                                                        |
-| -------------------- | ------------------------------------------------------------- |
+| Method                           | Reason                                                       |
+| -------------------------------- | ------------------------------------------------------------ |
 | `get` / `getStream` / `getBytes` | Cloudinary is not a byte-level storage backend               |
-| `copy`               | Cloudinary has no server-side copy API                        |
-| `setVisibility`      | Visibility is managed via access-control rules, not per-file |
-| `getSignedUploadUrl` | Use Cloudinary upload presets or direct SDK calls instead     |
+| `copy`                           | Cloudinary has no server-side copy API                       |
+| `setVisibility`                  | Visibility is managed via access-control rules, not per-file |
+| `getSignedUploadUrl`             | Use Cloudinary upload presets or direct SDK calls instead    |
 
 ## Advanced: Raw SDK Access
 

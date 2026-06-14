@@ -57,11 +57,15 @@ test.group('transformUrl (standalone helper)', (group) => {
       .stub(cloudinary, 'url')
       .returns('https://res.cloudinary.com/demo/image/upload/w_200,h_150/photo.jpg')
 
-    transformUrl('photo', {
-      cloudName: 'demo',
-      apiKey: 'key',
-      apiSecret: 'secret',
-    }, { width: 200, height: 150 })
+    transformUrl(
+      'photo',
+      {
+        cloudName: 'demo',
+        apiKey: 'key',
+        apiSecret: 'secret',
+      },
+      { width: 200, height: 150 }
+    )
 
     assert.deepEqual(urlStub.firstCall.args[1], { width: 200, height: 150 })
   })
