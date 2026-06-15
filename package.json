@@ -1,7 +1,7 @@
 {
   "name": "@rikology/adonisjs-cloudinary",
   "description": "Cloudinary integration for AdonisJS v7 — upload, transform, and deliver media through the Cloudinary v2 SDK, with IoC container support, Edge helpers, and an optional FlyDrive bridge.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "engines": {
     "node": ">=24.0.0"
   },
