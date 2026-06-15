@@ -1,3 +1,8 @@
+{{{
+  exports({
+    to: app.configPath('cloudinary.ts')
+  })
+}}}
 import env from '#start/env'
 import { defineConfig } from '@rikology/adonisjs-cloudinary'
 
