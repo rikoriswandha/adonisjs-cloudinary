@@ -21,6 +21,10 @@
     "./drive": {
       "types": "./build/src/drive/cloudinary_drive.d.ts",
       "default": "./build/src/drive/cloudinary_drive.js"
+    },
+    "./commands": {
+      "types": "./build/commands/main.d.ts",
+      "default": "./build/commands/main.js"
     }
   },
   "publishConfig": {
@@ -28,6 +32,7 @@
   },
   "scripts": {
     "copy:templates": "copyfiles \"stubs/**/*.stub\" build",
+    "copy:commands": "copyfiles \"commands/commands.json\" build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -36,7 +41,7 @@
     "test": "c8 npm run quick:test",
     "precompile": "npm run lint",
     "compile": "tsdown && tsc --emitDeclarationOnly --declaration",
-    "postcompile": "npm run copy:templates",
+    "postcompile": "npm run copy:templates && npm run copy:commands",
     "build": "npm run compile",
     "release": "release-it",
     "version": "npm run build",
@@ -107,7 +112,9 @@
       "./index.ts",
       "./configure.ts",
       "./providers/cloudinary_provider.ts",
-      "./src/drive/cloudinary_drive.ts"
+      "./src/drive/cloudinary_drive.ts",
+      "./commands/main.ts",
+      "./commands/cloudinary_ping.ts"
     ],
     "outDir": "./build",
     "clean": true,

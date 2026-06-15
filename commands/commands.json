@@ -1,0 +1,14 @@
+{
+  "commands": [
+    {
+      "commandName": "cloudinary:ping",
+      "description": "Verify Cloudinary credentials and API connectivity",
+      "namespace": "cloudinary",
+      "aliases": [],
+      "flags": [],
+      "args": [],
+      "options": { "startApp": true },
+      "filePath": "./cloudinary_ping.js"
+    }
+  ]
+}

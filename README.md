@@ -14,6 +14,7 @@ Cloudinary integration for AdonisJS v7 — upload, transform, and deliver media 
 - 🗄️ **Optional FlyDrive bridge** to use Cloudinary as a Drive disk
 - 🧩 **Zero-config Edge helper** that registers itself when Edge is installed (and stays out of the way in API-only apps)
 - 📦 **Standalone helpers** for scripts, workers, and non-AdonisJS projects
+- 🩺 **`cloudinary:ping` ace command** to verify your credentials right after install
 
 ## Documentation
 
@@ -31,26 +32,28 @@ Cloudinary integration for AdonisJS v7 — upload, transform, and deliver media 
 ## Installation
 
 ```sh
-# npm
-npm install @rikology/adonisjs-cloudinary
-
-# pnpm
-pnpm add @rikology/adonisjs-cloudinary
-
-# yarn
-yarn add @rikology/adonisjs-cloudinary
-
-# bun
-bun add @rikology/adonisjs-cloudinary
+node ace add @rikology/adonisjs-cloudinary
 ```
 
-Then run the AdonisJS configure command:
+That single command installs the package, publishes `config/cloudinary.ts`, registers the
+`CloudinaryProvider` and the `cloudinary:*` ace commands in `adonisrc.ts`, and wires env
+validation for your `CLOUDINARY_*` keys.
+
+Prefer the manual route?
 
 ```sh
+# install
+npm install @rikology/adonisjs-cloudinary # or: pnpm/yarn/bun add
+
+# then configure
 node ace configure @rikology/adonisjs-cloudinary
 ```
 
-This creates `config/cloudinary.ts` and registers the `CloudinaryProvider` in `adonisrc.ts`.
+Verify your credentials are wired up:
+
+```sh
+node ace cloudinary:ping
+```
 
 ## Environment variables
 
@@ -62,7 +65,7 @@ Add these to your `.env` (values from the [Cloudinary console](https://cloudinar
 | `CLOUDINARY_API_KEY`    | Yes      | Your Cloudinary API key    |
 | `CLOUDINARY_API_SECRET` | Yes      | Your Cloudinary API secret |
 
-Register them in your env validator (`start/env.ts`):
+`node ace add` / `configure` auto-registers these in your env validator (`start/env.ts`). The entry it adds looks like:
 
 ```ts
 import { Env } from '@adonisjs/core/env'
