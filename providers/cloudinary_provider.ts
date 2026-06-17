@@ -20,11 +20,19 @@ export default class CloudinaryProvider {
 
   /**
    * Register the Cloudinary service as a singleton in the container.
+   *
+   * The string token `'cloudinary'` is kept for backward compatibility;
+   * the class token `CloudinaryService` is also bound so consumers can
+   * resolve it idiomatically with `@inject()` or `container.make(CloudinaryService)`.
    */
   register() {
     this.app.container.singleton('cloudinary', async () => {
       const config = this.app.config.get<ConfigOptions>('cloudinary')
       return new CloudinaryService(config)
+    })
+
+    this.app.container.singleton(CloudinaryService, async () => {
+      return this.app.container.make('cloudinary')
     })
   }
 
@@ -36,7 +44,7 @@ export default class CloudinaryProvider {
       // edge.js may not be installed in API-only apps;
       // dynamic import is intentional here.
       const { default: edge } = await import('edge.js')
-      const cloudinary = await this.app.container.make('cloudinary')
+      const cloudinary = await this.app.container.make(CloudinaryService)
 
       edge.global('cloudinaryUrl', (publicId: string, transformations?: any) => {
         return cloudinary.transformUrl(publicId, transformations)

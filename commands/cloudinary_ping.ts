@@ -10,6 +10,7 @@
 */
 
 import { BaseCommand } from '@adonisjs/core/ace'
+import { CloudinaryService } from '../src/cloudinary_service.js'
 
 export default class CloudinaryPing extends BaseCommand {
   static commandName = 'cloudinary:ping'
@@ -17,7 +18,7 @@ export default class CloudinaryPing extends BaseCommand {
   static options = { startApp: true as const }
 
   async run() {
-    const cloudinary = await this.app.container.make('cloudinary')
+    const cloudinary = await this.app.container.make(CloudinaryService)
 
     try {
       const result = await cloudinary.sdk.api.ping()

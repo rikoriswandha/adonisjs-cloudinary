@@ -102,7 +102,9 @@ import type { CloudinaryConfig, ConfigOptions } from '@rikology/adonisjs-cloudin
 
 ## Container binding & type augmentation
 
-The provider registers the service as a singleton under the key **`cloudinary`**. The package augments AdonisJS's `ContainerBindings` interface so the container is fully typed:
+The provider registers the service as a singleton under the key **`cloudinary`**, and also binds the **`CloudinaryService` class token** so constructors and the `@inject()` decorator can resolve the service idiomatically.
+
+The package augments AdonisJS's `ContainerBindings` interface so the string token is fully typed:
 
 ```ts
 declare module '@adonisjs/core/types' {
@@ -112,7 +114,7 @@ declare module '@adonisjs/core/types' {
 }
 ```
 
-This means `app.container.make('cloudinary')` and the `@inject()` decorator resolve to a typed `CloudinaryService` with no manual casting.
+This means `app.container.make('cloudinary')` resolves to a typed `CloudinaryService` with no manual casting.
 
 ```ts
 import app from '@adonisjs/core/services/app'
@@ -120,6 +122,26 @@ import type { CloudinaryService } from '@rikology/adonisjs-cloudinary'
 
 const cloudinary = await app.container.make('cloudinary') // CloudinaryService
 ```
+
+For idiomatic injection, import `CloudinaryService` as a value and resolve or inject by class token:
+
+```ts
+import { CloudinaryService } from '@rikology/adonisjs-cloudinary'
+
+const cloudinary = await app.container.make(CloudinaryService)
+```
+
+```ts
+import { inject } from '@adonisjs/core'
+import { CloudinaryService } from '@rikology/adonisjs-cloudinary'
+
+@inject()
+export default class UploadService {
+  constructor(protected cloudinary: CloudinaryService) {}
+}
+```
+
+Both the string token and the class token resolve to the same singleton instance.
 
 ## How config is loaded at runtime
 
@@ -129,6 +151,10 @@ const cloudinary = await app.container.make('cloudinary') // CloudinaryService
 this.app.container.singleton('cloudinary', async () => {
   const config = this.app.config.get<ConfigOptions>('cloudinary')
   return new CloudinaryService(config)
+})
+
+this.app.container.singleton(CloudinaryService, async () => {
+  return this.app.container.make('cloudinary')
 })
 ```
 

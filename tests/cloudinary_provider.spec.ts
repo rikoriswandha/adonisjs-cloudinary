@@ -37,6 +37,22 @@ test.group('CloudinaryProvider', (group) => {
     assert.equal(service.sdk.config().cloud_name, 'demo')
   })
 
+  test('registers CloudinaryService as a class token singleton', async ({ assert }) => {
+    const app = createMockApp({
+      cloud_name: 'demo',
+      api_key: 'test-key',
+      api_secret: 'test-secret',
+      secure: true,
+    })
+
+    const provider = new CloudinaryProvider(app as any)
+    provider.register()
+
+    const service = await app.container.make(CloudinaryService)
+    assert.instanceOf(service, CloudinaryService)
+    assert.equal(service.sdk.config().cloud_name, 'demo')
+  })
+
   test('boot registers cloudinaryUrl edge global', async ({ assert }) => {
     const app = createMockApp({
       cloud_name: 'demo',
