@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
+import { fileURLToPath } from 'node:url'
 import { join } from 'node:path'
 
 import { test } from '@japa/runner'
@@ -71,7 +72,7 @@ test.group('Configure hook', () => {
 
     // stub published from the package's own stubs dir (not command.stubsRoot)
     const stubCall = calls.find((c) => c.method === 'makeUsingStub')!
-    assert.isTrue(stubCall.args[0].endsWith('stubs/'), `${stubCall.args[0]} should end with stubs/`)
+    assert.equal(stubCall.args[0], fileURLToPath(new URL('../stubs/', import.meta.url)))
     assert.equal(stubCall.args[1], 'config/cloudinary.stub')
 
     // rc file registers provider + commands
